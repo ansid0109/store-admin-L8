@@ -10,24 +10,9 @@ This is a Vue.js app that simulates a store admin portal where users can manuall
 - [Vue CLI Service](https://cli.vuejs.org/guide/cli-service.html)
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
-- [OpenAI API Key](https://beta.openai.com/docs/developer-quickstart/your-api-keys)
-- [Azure OpenAI API Key](https://azure.microsoft.com/products/cognitive-services/openai-service/)
 
 ### Running the app
 To run the necessary services, clone the repo, open a terminal, and navigate to the repo directory.
-
-If you have access to OpenAI or Azure OpenAI, open the `docker-compose.yml` file, uncomment the `ai-services` block, and add your OpenAI or Azure OpenAI credentials.
-
-> IMPORTANT: When filling in the values, do not put the value in double-quotes.
-
-```yaml
-environment:
-  - USE_AZURE_OPENAI=True # set to False if you are not using Azure OpenAI
-  - AZURE_OPENAI_DEPLOYMENT_NAME= # required if using Azure OpenAI
-  - AZURE_OPENAI_ENDPOINT= # required if using Azure OpenAI
-  - OPENAI_API_KEY= # always required
-  - OPENAI_ORG_ID= # required if using OpenAI
-```
 
 Then run the following command:
 
