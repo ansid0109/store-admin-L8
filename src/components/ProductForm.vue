@@ -1,59 +1,66 @@
 <template>
-  <div class="action-button">
-    <button @click="saveProduct" class="button">Save Product</button>
-  </div>
-  <br/>
-  <div v-if="showValidationErrors" class="error">
-    <br/>
-    <ul v-for="error in validationErrors" :key="error">
-      <li>{{ error }}</li>
-    </ul>
-  </div>
-  <div class="product-form">
-    <table>
-      <tr>
-        <td><label for="product-name">Name</label></td>
-        <td><input id="product-name" placeholder="Product Name" v-model="product.name" /></td>
-        <td></td>
-      </tr>
+  <div class="product-form-container">
+    <div class="form-header">
+      <h1>{{ product.id ? 'Edit Product' : 'Add New Product' }}</h1>
+      <router-link to="/products" class="back-link">← Back to Products</router-link>
+    </div>
 
-      <tr>
-        <td><label for="product-price">Price</label></td>
-        <td><input id="product-price" placeholder="Product Price" v-model="product.price" type="number" step="0.01" /></td>
-        <td></td>
-      </tr>
+    <div v-if="showValidationErrors" class="error-alert">
+      <div class="error-title">Please fix the following errors:</div>
+      <ul>
+        <li v-for="error in validationErrors" :key="error">{{ error }}</li>
+      </ul>
+    </div>
 
-      <tr>
-        <td><label for="product-tags">Keywords</label></td>
-        <td><input id="product-tags" placeholder="Product Keywords" v-model="product.tags" /></td>
-        <td></td>
-      </tr>
+    <div class="product-form">
+      <div class="form-section">
+        <div class="form-group">
+          <label for="product-name">Product Name *</label>
+          <input id="product-name" type="text" placeholder="Enter product name" v-model="product.name" />
+        </div>
 
-      <tr>
-        <td><label for="product-description">Description</label></td>
-        <td>
-          <textarea rows="8" id="product-description" placeholder="Product Description" v-model="product.description" />
-          <input type="hidden" id="product-id" placeholder="Product ID" v-model="product.id" />
-        </td>
-        <td>
-          <button @click="generateDescription" class="ai-button" v-show="aiCapabilities.includes('description')">Ask AI Assistant</button>
-        </td>
-      </tr>
+        <div class="form-group">
+          <label for="product-price">Price *</label>
+          <input id="product-price" placeholder="0.00" v-model="product.price" type="number" step="0.01" />
+        </div>
 
-      <tr>
-        <td><label for="product-image">Image</label></td>
-        <td>
-          <input id="product-image-text" placeholder="Product Image" v-model="product.image" v-show="!aiCapabilities.includes('image')"/>
-          <div id="product-image-container" class="image-container" :class="{ loading: isLoadingImage }" style="display: flex; align-items: center;" v-show="aiCapabilities.includes('image')">
-            <img v-if="product.image" :src="product.image" alt="Product Image" />
-            <div class="overlay">{{ overlayText }}</div>
+        <div class="form-group">
+          <label for="product-tags">Keywords</label>
+          <input id="product-tags" type="text" placeholder="e.g., electronics, gadgets" v-model="product.tags" />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="product-description">Description *</label>
+          <textarea id="product-description" rows="6" placeholder="Enter product description" v-model="product.description"></textarea>
+          <div class="ai-helper" v-show="aiCapabilities.includes('description')">
+            <button @click="generateDescription" class="btn btn-secondary">✨ Generate with AI</button>
           </div>
-        </td>
-        <td>
-          <button id="product-image-btn" @click="generateImage" class="ai-button" v-show="aiCapabilities.includes('image')">Generate Image</button>
-        </td>
-      </tr>
-    </table>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="product-image">Product Image</label>
+          <input type="hidden" id="product-id" v-model="product.id" />
+          
+          <div v-show="!aiCapabilities.includes('image')">
+            <input id="product-image-text" type="text" placeholder="Enter image URL" v-model="product.image" />
+          </div>
+
+          <div v-show="aiCapabilities.includes('image')" class="image-upload-section">
+            <div id="product-image-container" class="image-container" :class="{ loading: isLoadingImage }">
+              <img v-if="product.image" :src="product.image" alt="Product Image" />
+              <div v-if="!product.image && !isLoadingImage" class="placeholder">No image yet</div>
+              <div v-if="isLoadingImage" class="overlay">{{ overlayText }}</div>
+            </div>
+            <button id="product-image-btn" @click="generateImage" class="btn btn-secondary">✨ Generate Image with AI</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button @click="saveProduct" class="btn btn-primary btn-large">Save Product</button>
+      <router-link to="/products" class="btn btn-secondary btn-large">Cancel</router-link>
+    </div>
   </div>
 </template>
 
@@ -260,45 +267,143 @@
 </script>
 
 <style scoped>
-ul {
-  justify-content: center;
-  list-style: none;
+.product-form-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  margin-top: 1rem;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.form-header h1 {
+  font-size: 2rem;
+  color: #0046BE;
   margin: 0;
-  padding: 0;
-  width: 100%;
-  color: #ff0000;
 }
 
-img {
-  width: 100%;
+.back-link {
+  color: #0046BE;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
-table {
-  border-collapse: collapse;
+.back-link:hover {
+  color: #003fa0;
 }
 
-td {
-  vertical-align: center;
-  border: none;
+.error-alert {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  color: #721c24;
+}
+
+.error-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.error-alert ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.error-alert li {
+  margin-bottom: 0.5rem;
 }
 
 .product-form {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.form-section {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.form-group {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
 }
 
-.product-form input {
-  padding: 5px;
-  margin: 5px;
+.form-group.full-width {
+  grid-column: 1 / -1;
 }
 
-.ai-button {
-  height: 60px;
+.form-group label {
+  font-weight: 600;
+  color: #0046BE;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #0046BE;
+  box-shadow: 0 0 0 3px rgba(0, 70, 190, 0.1);
+}
+
+.form-group input[type="number"] {
+  font-family: 'Courier New', monospace;
+}
+
+.ai-helper {
+  margin-top: 1rem;
+}
+
+.image-upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .image-container {
   position: relative;
-  width: 102%;
+  width: 100%;
+  height: 300px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-container .placeholder {
+  color: #999;
+  font-size: 1rem;
 }
 
 .overlay {
@@ -307,18 +412,86 @@ td {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
   color: white;
   display: flex;
   justify-content: center;
   align-items: center;
   opacity: 0;
   transition: opacity 0.3s ease;
-  font-size: x-large;
-  font-weight: bolder;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .image-container.loading .overlay {
   opacity: 1;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: #FFB81C;
+  color: #0046BE;
+}
+
+.btn-primary:hover {
+  background-color: #ff9e00;
+  box-shadow: 0 4px 12px rgba(255, 184, 28, 0.3);
+}
+
+.btn-secondary {
+  background-color: #0046BE;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #003fa0;
+  box-shadow: 0 4px 12px rgba(0, 70, 190, 0.3);
+}
+
+.btn-large {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
+@media (max-width: 768px) {
+  .form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .form-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .product-form {
+    padding: 1.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-large {
+    width: 100%;
+  }
 }
 </style>

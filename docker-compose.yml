@@ -37,7 +37,7 @@ services:
         condition: service_healthy
 
   makeline-service:
-    image: ramymohamed/makeline-service-l8:latest
+    image: ansid0cker/bbuy-final-makeline-service:latest
     container_name: 'makeline-service'
     restart: always
     ports:
